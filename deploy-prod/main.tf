@@ -21,7 +21,7 @@ data "terraform_remote_state" "global-admiral" {
 # make sure this resource is created before the module prod-deployer
 resource "null_resource" "create-key-pair" {
   provisioner "local-exec" {
-      command = "./scripts/create-keypair.sh -k ${var.app_name}-key -r ${var.aws_region} -b ${data.terraform_remote_state.prod.config-bucket-name}"
+      command = "../scripts/create-keypair.sh -k ${var.app_name}-key -r ${var.aws_region} -b ${data.terraform_remote_state.prod.config-bucket-name}"
   }
 }
 
@@ -41,7 +41,7 @@ module "prod-deployer" {
   # LC parameters
   ami              = "${var.prod_ami}" # The AMI that is to be launched
   instance_type    = "${var.instance_type}"
-  iam_assume_role_policy = "${file("./policy/assume-role-policy.json")}"
+  iam_assume_role_policy = "${file("../policy/assume-role-policy.json")}"
   iam_role_policy  = "${data.template_file.deployer-policy.rendered}"
   user_data        = "" # No user data as custom AMI will be launched
   key_name         = "${var.app_name}-key"
@@ -60,7 +60,7 @@ module "prod-deployer" {
 
 ## Template files
 data "template_file" "deployer-policy" {
-  template = "${file("./policy/role-policy.json")}"
+  template = "${file("../policy/role-policy.json")}"
 
   vars {
     config_bucket_arn = "${data.terraform_remote_state.prod.config-bucket-arn}"
