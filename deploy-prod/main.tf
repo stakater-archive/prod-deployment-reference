@@ -165,8 +165,8 @@ module "deployer-scale-up-policy" {
   name = "${var.app_name}-prod-scaleup-policy"
 
   # ASG parameters
-  asg_name = "${module.deployer.asg_name}"
-  asg_id   = "${module.deployer.asg_id}"
+  asg_name = "${module.prod-deployer.asg_name}"
+  asg_id   = "${module.prod-deployer.asg_id}"
 
   # Notification parameters
   notifications = "autoscaling:EC2_INSTANCE_LAUNCH_ERROR,autoscaling:EC2_INSTANCE_TERMINATE_ERROR"
@@ -187,11 +187,11 @@ module "deployer-scale-down-policy" {
   source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy"
 
   # Resource tags
-  name = "${var.stack_name}-prod-scaledown-policy"
+  name = "${var.app_name}-prod-scaledown-policy"
 
   # ASG parameters
-  asg_name = "${module.deployer.asg_name}"
-  asg_id   = "${module.deployer.asg_id}"
+  asg_name = "${module.prod-deployer.asg_name}"
+  asg_id   = "${module.prod-deployer.asg_id}"
 
   # Notification parameters
   notifications = "autoscaling:EC2_INSTANCE_LAUNCH_ERROR,autoscaling:EC2_INSTANCE_TERMINATE_ERROR"
@@ -215,7 +215,7 @@ resource "aws_security_group_rule" "sg-deployer" {
   to_port                  = 8080
   protocol                 = "tcp"
   cidr_blocks              = ["${data.terraform_remote_state.prod.vpc_cidr}"]
-  security_group_id        = "${module.deployer.security_group_id}"
+  security_group_id        = "${module.prod-deployer.security_group_id}"
 
   lifecycle {
     create_before_destroy = true
