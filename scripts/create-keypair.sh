@@ -6,7 +6,7 @@ BUCKET_NAME=""
 rOptionFlag=false;
 kOptionFlag=false;
 bOptionFlag=false;
-while getopts ":k:r:" OPTION
+while getopts ":k:r:b:" OPTION
 do
   case $OPTION in
     k)
