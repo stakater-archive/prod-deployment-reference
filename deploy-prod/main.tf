@@ -18,6 +18,7 @@ data "terraform_remote_state" "global-admiral" {
 }
 
 # Create keypair if not exists and upload to s3
+# make sure this resource is created before the module prod-deployer
 resource "null_resource" "create-key-pair" {
   provisioner "local-exec" {
       command = "./scripts/create-keypair.sh -k ${var.app_name}-key -r ${var.aws_region} -b ${data.terraform_remote_state.prod.config-bucket.bucket_name}"
@@ -27,7 +28,6 @@ resource "null_resource" "create-key-pair" {
 ## Provisions basic autoscaling group
 module "prod-deployer" {
   source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/instance-pool"
-  depends_on = ["null_resource.create-key-pair"]
 
   # Resource tags
   name = "${var.app_name}"
