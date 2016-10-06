@@ -21,7 +21,7 @@ data "terraform_remote_state" "global-admiral" {
 # make sure this resource is created before the module prod-deployer
 resource "null_resource" "create-key-pair" {
   provisioner "local-exec" {
-      command = "./scripts/create-keypair.sh -k ${var.app_name}-key -r ${var.aws_region} -b ${data.terraform_remote_state.prod.config-bucket.bucket_name}"
+      command = "./scripts/create-keypair.sh -k ${var.app_name}-key -r ${var.aws_region} -b ${data.terraform_remote_state.prod.config-bucket-name}"
   }
 }
 
