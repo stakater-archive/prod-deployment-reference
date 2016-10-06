@@ -15,7 +15,7 @@ do
       ;;
     r)
       rOptionFlag=true;
-      KEY_NAME=$OPTARG
+      AWS_REGION=$OPTARG
       ;;
     b)
       bOptionFlag=true;
@@ -27,7 +27,6 @@ do
       ;;
   esac
 done
-exit 0
 
 if ! $kOptionFlag || ! $rOptionFlag || ! $bOptionFlag;
 then
@@ -35,6 +34,7 @@ then
   exit 0;
 fi
 
+TMP_DIR="../keypair"
 if  aws --region ${AWS_REGION} ec2 describe-key-pairs --key-name ${KEY_NAME} > /dev/null 2>&1 ;
 then
   echo "keypair ${KEY_NAME} already exists."
@@ -42,7 +42,7 @@ else
   mkdir -p ${TMP_DIR}
   chmod 700 ${TMP_DIR}
   echo "Creating keypair ${KEY_NAME} and uploading to s3"
-  aws --region ${AWS_REGION} ec2 create-key-pair --key-name ${KEY_NAME} --query 'KeyMaterial' --output text > ${KEY_NAME}.pem
+  aws --region ${AWS_REGION} ec2 create-key-pair --key-name ${KEY_NAME} --query 'KeyMaterial' --output text > ${TMP_DIR}/${KEY_NAME}.pem
   aws --region ${AWS_REGION} s3 cp ${TMP_DIR}/${KEY_NAME}.pem s3://${BUCKET_NAME}/keypairs/${KEY_NAME}.pem
 
   # Clean up
