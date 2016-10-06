@@ -1,3 +1,8 @@
+## Configures providers
+provider "aws" {
+  region = "${var.aws_region}"
+}
+
 # Remote states
 data "terraform_remote_state" "prod" {
     backend = "s3"
