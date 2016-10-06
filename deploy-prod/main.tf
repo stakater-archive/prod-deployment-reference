@@ -63,8 +63,8 @@ data "template_file" "deployer-policy" {
   template = "${file("./policy/role-policy.json")}"
 
   vars {
-    config_bucket_arn = "${data.terraform_remote_state.prod.config-bucket.arn}"
-    cloudinit_bucket_arn = "${data.terraform_remote_state.prod.cloudinit-bucket.arn}"
+    config_bucket_arn = "${data.terraform_remote_state.prod.config-bucket-arn}"
+    cloudinit_bucket_arn = "${data.terraform_remote_state.prod.cloudinit-bucket-arn}"
     global_admiral_config_bucket_arn = "${data.terraform_remote_state.global-admiral.config-bucket-arn}"
   }
 }
