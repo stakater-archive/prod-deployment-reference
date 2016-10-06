@@ -101,7 +101,7 @@ resource "aws_security_group" "deployer-sg-elb" {
 
 ## Creates ELB
 resource "aws_elb" "deployer-elb" {
-  name                      = "${var.app_name}-prod-elb"
+  name                      = "${replace(var.app_name, "_", "-"}-prod-elb" #replace _ with - as _ is not allowed in elb-name
   security_groups           = ["${aws_security_group.deployer-sg-elb.id}"]
   subnets                   = ["${split(",",data.terraform_remote_state.prod.public_subnet_ids)}"]
   internal                  = false
