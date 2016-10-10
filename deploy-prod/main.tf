@@ -39,7 +39,6 @@ module "prod-deployer" {
 
   # VPC parameters
   vpc_id  = "${data.terraform_remote_state.prod.vpc_id}"
-  vpc_cidr  = "${data.terraform_remote_state.prod.vpc_cidr}"
   subnets = "${data.terraform_remote_state.prod.private_app_subnet_ids}"
   region  = "${var.aws_region}"
 
