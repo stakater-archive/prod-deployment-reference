@@ -214,7 +214,35 @@ module "deployer-scale-down-policy" {
 
 
 ## Adds security group rules
-resource "aws_security_group_rule" "sg-deployer" {
+# Allow ssh from within vpc
+resource "aws_security_group_rule" "sg-deployer-ssh" {
+  type                     = "ingress"
+  from_port                = 22
+  to_port                  = 22
+  protocol                 = "tcp"
+  cidr_blocks              = ["${data.terraform_remote_state.prod.vpc_cidr}"]
+  security_group_id        = "${module.prod-deployer.security_group_id}"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+# Allow Outgoing traffic
+resource "aws_security_group_rule" "sg-deployer-outgoing" {
+  type                     = "egress"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  cidr_blocks              = ["0.0.0.0/0"]
+  security_group_id        = "${module.prod-deployer.security_group_id}"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_security_group_rule" "sg-deployer-app" {
   type                     = "ingress"
   from_port                = 8080
   to_port                  = 8080
