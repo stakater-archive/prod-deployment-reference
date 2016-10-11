@@ -253,18 +253,4 @@ resource "aws_security_group_rule" "sg-deployer-app" {
     create_before_destroy = true
   }
 }
-
-## Adds security group rule in docker registry
-# Allow registry to be accessed by this VPC
-resource "aws_security_group_rule" "sg-deployer-registry" {
-  type                     = "ingress"
-  from_port                = 80
-  to_port                  = 80
-  protocol                 = "tcp"
-  cidr_blocks              = ["${data.terraform_remote_state.prod.vpc_cidr}"]
-  security_group_id        = "${data.terraform_remote_state.global-admiral.docker-registry-sg-id}"
-
-  lifecycle {
-    create_before_destroy = true
-  }
 }
