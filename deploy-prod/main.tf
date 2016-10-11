@@ -253,4 +253,3 @@ resource "aws_security_group_rule" "sg-deployer-app" {
     create_before_destroy = true
   }
 }
-}
