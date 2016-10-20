@@ -29,7 +29,8 @@ module "prod-green-group-deployer" {
   # ASG parameters
   max_size         = "${var.green_cluster_max_size}"
   min_size         = "${var.green_cluster_min_size}"
-  load_balancers   = "${aws_elb.deployer-elb.id}"
+  min_elb_capacity = "${var.green_group_min_elb_capacity}"
+  load_balancers   = "${var.green_group_load_balancers}"
 }
 
 ####################################
