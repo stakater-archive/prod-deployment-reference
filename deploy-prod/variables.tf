@@ -39,6 +39,14 @@ variable "blue_cluster_min_size" {
   description = "Minimum instances in blue group"
 }
 
+variable "blue_group_load_balancers" {
+  description = "List of load balancers to add to blue auto sscaling group"
+}
+
+variable "blue_group_min_elb_capacity" {
+  description = "Minimum number of healthy instances attached to the ELB."
+}
+
 
 ## Green group parameters
 variable "ami_green_group" {
@@ -51,4 +59,12 @@ variable "green_cluster_max_size" {
 
 variable "green_cluster_min_size" {
   description = "Minimum instances in green group"
+}
+
+variable "green_group_load_balancers" {
+  description = "List of load balancers to add to green auto sscaling group"
+}
+
+variable "green_group_min_elb_capacity" {
+  description = "Minimum number of healthy instances attached to the ELB."
 }
