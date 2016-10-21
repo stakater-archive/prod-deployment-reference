@@ -113,9 +113,9 @@ resource "aws_lb_cookie_stickiness_policy" "deployer-elb-active-stickiness-polic
 }
 
 # Route53 record
-resource "aws_route53_record" "deployer-active" {
+resource "aws_route53_record" "deployer-prod-active" {
   zone_id = "${data.terraform_remote_state.global-admiral.route53_private_zone_id}"
-  name = "${var.app_name}-active"
+  name = "${var.app_name}-prod-active"
   type = "A"
 
   alias {
@@ -167,9 +167,9 @@ resource "aws_lb_cookie_stickiness_policy" "deployer-elb-test-stickiness-policy"
 }
 
 # Route53 record
-resource "aws_route53_record" "deployer-test" {
+resource "aws_route53_record" "deployer-prod-test" {
   zone_id = "${data.terraform_remote_state.global-admiral.route53_private_zone_id}"
-  name = "${var.app_name}-test"
+  name = "${var.app_name}-prod-test"
   type = "A"
 
   alias {
