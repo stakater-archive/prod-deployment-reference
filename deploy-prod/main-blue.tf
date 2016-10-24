@@ -128,3 +128,17 @@ resource "aws_security_group_rule" "blue-group-sg-deployer-app" {
     create_before_destroy = true
   }
 }
+
+resource "aws_security_group_rule" "blue-group-sg-deployer-app-ssl" {
+  count                    = "${signum(var.enable_ssl)}" # if enable_ssl is set to false, this will result in 0 and will create non-ssl resource
+  type                     = "ingress"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "tcp"
+  cidr_blocks              = ["${data.terraform_remote_state.prod.vpc_cidr}"]
+  security_group_id        = "${module.prod-blue-group-deployer.security_group_id}"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
