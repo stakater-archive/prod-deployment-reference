@@ -129,7 +129,7 @@ resource "aws_security_group_rule" "green-group-sg-deployer-app" {
   }
 }
 
-resource "aws_security_group_rule" "green-group-sg-deployer-app" {
+resource "aws_security_group_rule" "green-group-sg-deployer-app-ssl" {
   count                    = "${var.enable_ssl}" # if enable_ssl is set to false, this will result in 0 and will create non-ssl resource
   type                     = "ingress"
   from_port                = 80
