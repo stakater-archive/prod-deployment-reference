@@ -137,7 +137,7 @@ resource "aws_elb" "deployer-elb-active" {
     unhealthy_threshold = 2
     timeout             = 5
     target              = "TCP:22"
-    interval            = 30
+    interval            = 10
   }
 
   lifecycle {
@@ -187,7 +187,7 @@ resource "aws_elb" "deployer-elb-active-ssl" {
     unhealthy_threshold = 2
     timeout             = 5
     target              = "TCP:22"
-    interval            = 30
+    interval            = 10
   }
 
   lifecycle {
@@ -265,7 +265,7 @@ resource "aws_elb" "deployer-elb-test" {
     unhealthy_threshold = 2
     timeout             = 5
     target              = "TCP:22"
-    interval            = 30
+    interval            = 10
   }
 
   lifecycle {
@@ -315,7 +315,7 @@ resource "aws_elb" "deployer-elb-test-ssl" {
     unhealthy_threshold = 2
     timeout             = 5
     target              = "TCP:22"
-    interval            = 30
+    interval            = 10
   }
 
   lifecycle {
