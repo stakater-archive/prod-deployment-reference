@@ -27,7 +27,6 @@ variable "app_name" {
 
 variable "enable_ssl" {
   description = "If set to true, This will create resources with SSL settings enabled. If false, it will create resources without SSL settings enabled"
-  default = false
 }
 
 ## Blue group parameters
