@@ -30,6 +30,11 @@ variable "enable_ssl" {
   default = "0"
 }
 
+variable "ssl_certificate_id" {
+  description = "Required if enable_ssl is set"
+  default = ""
+}
+
 ## Blue group parameters
 variable "ami_blue_group" {
   description = "AMI ID to be deployed on blue group"
