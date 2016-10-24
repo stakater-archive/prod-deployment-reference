@@ -179,6 +179,7 @@ resource "aws_elb" "deployer-elb-active-ssl" {
     instance_protocol = "http"
     lb_port           = 443
     lb_protocol       = "https"
+    ssl_certificate_id = "${var.ssl_certificate_id}"
   }
 
   health_check {
