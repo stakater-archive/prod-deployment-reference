@@ -196,7 +196,7 @@ resource "aws_elb" "deployer-elb-active-ssl" {
 
 resource "aws_lb_cookie_stickiness_policy" "deployer-elb-active-stickiness-policy-ssl-80" {
       count = "${signum(var.enable_ssl)}" # if enable_ssl is set to true, this will result in 1 and will create ssl resource
-      name = "${aws_elb.deployer-elb-active.name}-stickiness"
+      name = "${aws_elb.deployer-elb-active-ssl.name}-stickiness"
       load_balancer = "${aws_elb.deployer-elb-active-ssl.id}"
       lb_port = 80
 }
@@ -204,7 +204,7 @@ resource "aws_lb_cookie_stickiness_policy" "deployer-elb-active-stickiness-polic
 # ELB Stickiness policy
 resource "aws_lb_cookie_stickiness_policy" "deployer-elb-active-stickiness-policy-ssl-443" {
       count = "${signum(var.enable_ssl)}" # if enable_ssl is set to true, this will result in 1 and will create ssl resource
-      name = "${aws_elb.deployer-elb-active.name}-stickiness"
+      name = "${aws_elb.deployer-elb-active-ssl.name}-stickiness"
       load_balancer = "${aws_elb.deployer-elb-active-ssl.id}"
       lb_port = 443
 }
@@ -322,14 +322,14 @@ resource "aws_elb" "deployer-elb-test-ssl" {
 }
 resource "aws_lb_cookie_stickiness_policy" "deployer-elb-test-stickiness-policy-ssl-80" {
       count = "${signum(var.enable_ssl)}" # if enable_ssl is set to true, this will result in 1 and will create ssl resource
-      name = "${aws_elb.deployer-elb-test.name}-stickiness"
+      name = "${aws_elb.deployer-elb-test-ssl.name}-stickiness"
       load_balancer = "${aws_elb.deployer-elb-test-ssl.id}"
       lb_port = 80
 }
 
 resource "aws_lb_cookie_stickiness_policy" "deployer-elb-test-stickiness-policy-ssl-443" {
       count = "${signum(var.enable_ssl)}" # if enable_ssl is set to true, this will result in 1 and will create ssl resource
-      name = "${aws_elb.deployer-elb-test.name}-stickiness"
+      name = "${aws_elb.deployer-elb-test-ssl.name}-stickiness"
       load_balancer = "${aws_elb.deployer-elb-test-ssl.id}"
       lb_port = 443
 }
