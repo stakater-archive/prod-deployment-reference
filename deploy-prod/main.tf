@@ -116,7 +116,7 @@ resource "aws_elb" "deployer-elb-active" {
   name                      = "${replace(var.app_name, "_", "-")}-prod-elb-active" #replace _ with - as _ is not allowed in elb-name
   security_groups           = ["${aws_security_group.deployer-sg-elb.id}"]
   subnets                   = ["${split(",",data.terraform_remote_state.prod.public_subnet_ids)}"]
-  internal                  = false
+  internal                  = "${var.internal_support}"
   cross_zone_load_balancing = true
   connection_draining       = true
 
@@ -244,7 +244,7 @@ resource "aws_elb" "deployer-elb-test" {
   name                      = "${replace(var.app_name, "_", "-")}-prod-elb-test" #replace _ with - as _ is not allowed in elb-name
   security_groups           = ["${aws_security_group.deployer-sg-elb.id}"]
   subnets                   = ["${split(",",data.terraform_remote_state.prod.public_subnet_ids)}"]
-  internal                  = false
+  internal                  = "${var.internal_support}"
   cross_zone_load_balancing = true
   connection_draining       = true
 
