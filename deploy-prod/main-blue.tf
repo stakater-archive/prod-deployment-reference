@@ -29,6 +29,7 @@ module "prod-blue-group-deployer" {
   # ASG parameters
   max_size         = "${var.blue_cluster_max_size}"
   min_size         = "${var.blue_cluster_min_size}"
+  desired_size     = "${var.blue_cluster_desired_size}"
   min_elb_capacity = "${var.blue_group_min_elb_capacity}"
   load_balancers   = "${var.blue_group_load_balancers}"
 }
