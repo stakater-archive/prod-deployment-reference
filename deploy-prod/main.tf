@@ -213,7 +213,7 @@ resource "aws_lb_cookie_stickiness_policy" "deployer-elb-active-stickiness-polic
 # Route53 record
 resource "aws_route53_record" "deployer-prod-active" {
   count = "${signum(var.enable_ssl) + 1 % 2}" # if enable_ssl is set to false, this will result in 0 and will create non-ssl resource
-  zone_id = "${data.terraform_remote_state.global-admiral.route53_private_zone_id}"
+  zone_id = "${data.terraform_remote_state.prod.route53_private_zone_id}"
   name = "${var.app_name}-prod-active"
   type = "A"
 
@@ -227,7 +227,7 @@ resource "aws_route53_record" "deployer-prod-active" {
 # Route53 record
 resource "aws_route53_record" "deployer-prod-active-ssl" {
   count = "${signum(var.enable_ssl)}" # if enable_ssl is set to true, this will result in 1 and will create ssl resource
-  zone_id = "${data.terraform_remote_state.global-admiral.route53_private_zone_id}"
+  zone_id = "${data.terraform_remote_state.prod.route53_private_zone_id}"
   name = "${var.app_name}-prod-active"
   type = "A"
 
@@ -339,7 +339,7 @@ resource "aws_lb_cookie_stickiness_policy" "deployer-elb-test-stickiness-policy-
 # Route53 record
 resource "aws_route53_record" "deployer-prod-test" {
   count = "${signum(var.enable_ssl) + 1 % 2}" # if enable_ssl is set to false, this will result in 0 and will create non-ssl resource
-  zone_id = "${data.terraform_remote_state.global-admiral.route53_private_zone_id}"
+  zone_id = "${data.terraform_remote_state.prod.route53_private_zone_id}"
   name = "${var.app_name}-prod-test"
   type = "A"
 
@@ -352,7 +352,7 @@ resource "aws_route53_record" "deployer-prod-test" {
 
 resource "aws_route53_record" "deployer-prod-test-ssl" {
   count = "${signum(var.enable_ssl)}" # if enable_ssl is set to true, this will result in 1 and will create ssl resource
-  zone_id = "${data.terraform_remote_state.global-admiral.route53_private_zone_id}"
+  zone_id = "${data.terraform_remote_state.prod.route53_private_zone_id}"
   name = "${var.app_name}-prod-test"
   type = "A"
 
