@@ -48,6 +48,10 @@ variable "blue_cluster_min_size" {
   description = "Minimum instances in blue group"
 }
 
+variable "blue_cluster_desired_size" {
+  description = "Desired instances in blue group"
+}
+
 variable "blue_group_load_balancers" {
   description = "List of load balancers to add to blue auto sscaling group"
 }
@@ -68,6 +72,10 @@ variable "green_cluster_max_size" {
 
 variable "green_cluster_min_size" {
   description = "Minimum instances in green group"
+}
+
+variable "green_cluster_desired_size" {
+  description = "Desired instances in green group"
 }
 
 variable "green_group_load_balancers" {
