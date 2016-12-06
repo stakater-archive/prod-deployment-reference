@@ -9,8 +9,8 @@ module "prod-green-group-deployer" {
   name = "${var.app_name}-green-group"
 
   # VPC parameters
-  vpc_id  = "${data.terraform_remote_state.prod.vpc_id}"
-  subnets = "${data.terraform_remote_state.prod.private_app_subnet_ids}"
+  vpc_id  = "${data.terraform_remote_state.env_state.vpc_id}"
+  subnets = "${data.terraform_remote_state.env_state.private_app_subnet_ids}"
   region  = "${var.aws_region}"
 
   # LC parameters
@@ -42,7 +42,7 @@ module "deployer-green-group-scale-up-policy" {
   source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy"
 
   # Resource tags
-  name = "${var.app_name}-prod-green-group-scaleup-policy"
+  name = "${var.app_name}-${var.environment}-green-group-scaleup-policy"
 
   # ASG parameters
   asg_name = "${module.prod-green-group-deployer.asg_name}"
@@ -66,7 +66,7 @@ module "deployer-green-group-scale-down-policy" {
   source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/asg-policy"
 
   # Resource tags
-  name = "${var.app_name}-prod-green-group-scaledown-policy"
+  name = "${var.app_name}-${var.environment}-green-group-scaledown-policy"
 
   # ASG parameters
   asg_name = "${module.prod-green-group-deployer.asg_name}"
@@ -94,7 +94,7 @@ resource "aws_security_group_rule" "green-group-sg-deployer-ssh" {
   from_port                = 22
   to_port                  = 22
   protocol                 = "tcp"
-  cidr_blocks              = ["${data.terraform_remote_state.prod.vpc_cidr}"]
+  cidr_blocks              = ["${data.terraform_remote_state.env_state.vpc_cidr}"]
   security_group_id        = "${module.prod-green-group-deployer.security_group_id}"
 
   lifecycle {
@@ -121,7 +121,7 @@ resource "aws_security_group_rule" "green-group-sg-deployer-app" {
   from_port                = 8080
   to_port                  = 8080
   protocol                 = "tcp"
-  cidr_blocks              = ["${data.terraform_remote_state.prod.vpc_cidr}"]
+  cidr_blocks              = ["${data.terraform_remote_state.env_state.vpc_cidr}"]
   security_group_id        = "${module.prod-green-group-deployer.security_group_id}"
 
   lifecycle {
@@ -135,7 +135,7 @@ resource "aws_security_group_rule" "green-group-sg-deployer-app-ssl" {
   from_port                = 80
   to_port                  = 80
   protocol                 = "tcp"
-  cidr_blocks              = ["${data.terraform_remote_state.prod.vpc_cidr}"]
+  cidr_blocks              = ["${data.terraform_remote_state.env_state.vpc_cidr}"]
   security_group_id        = "${module.prod-green-group-deployer.security_group_id}"
 
   lifecycle {

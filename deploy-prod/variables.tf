@@ -2,13 +2,16 @@ variable "aws_region" {
   description = "AWS Region in which the deployment is taking place in"
 }
 
+variable "environment" {
+  description = "Environment of sub stack"
+}
+
 variable "tf_state_bucket_name" {
   description = "Name of the S3 bucket in which the terraform state files are stored"
 }
 
-variable "prod_state_key" {
-  description = "Key for the prod environment terraform state on S3"
-  default = "prod/terraform.tfstate"
+variable "env_state_key" {
+  description = "Key for the environment terraform state on S3"
 }
 
 variable "global_admiral_state_key" {
