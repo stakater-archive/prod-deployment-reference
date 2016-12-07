@@ -48,7 +48,7 @@ resource "aws_security_group" "deployer-sg-elb" {
   vpc_id      = "${data.terraform_remote_state.env_state.vpc_id}"
 
   tags {
-    Name        = "${var.app_name}-prod-elb"
+    Name        = "${var.app_name}-${var.environment}-elb"
     managed_by  = "Stakater"
   }
 
@@ -75,11 +75,11 @@ resource "aws_security_group" "deployer-sg-elb" {
 ## Creates ELB security group
 resource "aws_security_group" "deployer-sg-elb-ssl" {
   count       = "${signum(var.enable_ssl)}" # if enable_ssl is set to true, this will result in 1 and will create ssl resource
-  name_prefix = "${var.app_name}-prod-elb-"
+  name_prefix = "${var.app_name}-${var.environment}-elb-"
   vpc_id      = "${data.terraform_remote_state.env_state.vpc_id}"
 
   tags {
-    Name        = "${var.app_name}-prod-elb"
+    Name        = "${var.app_name}-${var.environment}-elb"
     managed_by  = "Stakater"
   }
 
@@ -113,7 +113,7 @@ resource "aws_security_group" "deployer-sg-elb-ssl" {
 ## Creates Active ELB
 resource "aws_elb" "deployer-elb-active" {
   count                     = "${signum(var.enable_ssl) + 1 % 2}" # if enable_ssl is set to false, this will result in 0 and will create non-ssl resource
-  name                      = "${replace(var.app_name, "_", "-")}-prod-elb-active" #replace _ with - as _ is not allowed in elb-name
+  name                      = "${replace(var.app_name, "_", "-")}-${var.environment}-elb-active" #replace _ with - as _ is not allowed in elb-name
   security_groups           = ["${aws_security_group.deployer-sg-elb.id}"]
   subnets                   = ["${split(",",data.terraform_remote_state.env_state.public_subnet_ids)}"]
   internal                  = "${var.internal_support}"
@@ -121,7 +121,7 @@ resource "aws_elb" "deployer-elb-active" {
   connection_draining       = true
 
   tags {
-    Name        = "${var.app_name}-prod-elb-active"
+    Name        = "${var.app_name}-${var.environment}-elb-active"
     managed_by  = "Stakater"
   }
 
@@ -155,7 +155,7 @@ resource "aws_lb_cookie_stickiness_policy" "deployer-elb-active-stickiness-polic
 
 resource "aws_elb" "deployer-elb-active-ssl" {
   count                     = "${signum(var.enable_ssl)}" # if enable_ssl is set to true, this will result in 1 and will create ssl resource
-  name                      = "${replace(var.app_name, "_", "-")}-prod-elb-active" #replace _ with - as _ is not allowed in elb-name
+  name                      = "${replace(var.app_name, "_", "-")}-${var.environment}-elb-active" #replace _ with - as _ is not allowed in elb-name
   security_groups           = ["${aws_security_group.deployer-sg-elb-ssl.id}"]
   subnets                   = ["${split(",",data.terraform_remote_state.env_state.public_subnet_ids)}"]
   internal                  = false
@@ -163,7 +163,7 @@ resource "aws_elb" "deployer-elb-active-ssl" {
   connection_draining       = true
 
   tags {
-    Name        = "${var.app_name}-prod-elb-active"
+    Name        = "${var.app_name}-${var.environment}-elb-active"
     managed_by  = "Stakater"
   }
 
@@ -214,7 +214,7 @@ resource "aws_lb_cookie_stickiness_policy" "deployer-elb-active-stickiness-polic
 resource "aws_route53_record" "deployer-prod-active" {
   count = "${signum(var.enable_ssl) + 1 % 2}" # if enable_ssl is set to false, this will result in 0 and will create non-ssl resource
   zone_id = "${data.terraform_remote_state.env_state.route53_private_zone_id}"
-  name = "${var.app_name}-prod-active"
+  name = "${var.app_name}-${var.environment}-active"
   type = "A"
 
   alias {
@@ -228,7 +228,7 @@ resource "aws_route53_record" "deployer-prod-active" {
 resource "aws_route53_record" "deployer-prod-active-ssl" {
   count = "${signum(var.enable_ssl)}" # if enable_ssl is set to true, this will result in 1 and will create ssl resource
   zone_id = "${data.terraform_remote_state.env_state.route53_private_zone_id}"
-  name = "${var.app_name}-prod-active"
+  name = "${var.app_name}-${var.environment}-active"
   type = "A"
 
   alias {
@@ -241,7 +241,7 @@ resource "aws_route53_record" "deployer-prod-active-ssl" {
 ## Creates Test ELB
 resource "aws_elb" "deployer-elb-test" {
   count                     = "${signum(var.enable_ssl) + 1 % 2}" # if enable_ssl is set to false, this will result in 0 and will create non-ssl resource
-  name                      = "${replace(var.app_name, "_", "-")}-prod-elb-test" #replace _ with - as _ is not allowed in elb-name
+  name                      = "${replace(var.app_name, "_", "-")}-${var.environment}-elb-test" #replace _ with - as _ is not allowed in elb-name
   security_groups           = ["${aws_security_group.deployer-sg-elb.id}"]
   subnets                   = ["${split(",",data.terraform_remote_state.env_state.public_subnet_ids)}"]
   internal                  = "${var.internal_support}"
@@ -249,7 +249,7 @@ resource "aws_elb" "deployer-elb-test" {
   connection_draining       = true
 
   tags {
-    Name        = "${var.app_name}-prod-elb-test"
+    Name        = "${var.app_name}-${var.environment}-elb-test"
     managed_by  = "Stakater"
   }
 
@@ -283,7 +283,7 @@ resource "aws_lb_cookie_stickiness_policy" "deployer-elb-test-stickiness-policy"
 
 resource "aws_elb" "deployer-elb-test-ssl" {
   count                     = "${signum(var.enable_ssl)}" # if enable_ssl is set to true, this will result in 1 and will create ssl resource
-  name                      = "${replace(var.app_name, "_", "-")}-prod-elb-test" #replace _ with - as _ is not allowed in elb-name
+  name                      = "${replace(var.app_name, "_", "-")}-${var.environment}-elb-test" #replace _ with - as _ is not allowed in elb-name
   security_groups           = ["${aws_security_group.deployer-sg-elb-ssl.id}"]
   subnets                   = ["${split(",",data.terraform_remote_state.env_state.public_subnet_ids)}"]
   internal                  = false
@@ -291,7 +291,7 @@ resource "aws_elb" "deployer-elb-test-ssl" {
   connection_draining       = true
 
   tags {
-    Name        = "${var.app_name}-prod-elb-test"
+    Name        = "${var.app_name}-${var.environment}-elb-test"
     managed_by  = "Stakater"
   }
 
@@ -340,7 +340,7 @@ resource "aws_lb_cookie_stickiness_policy" "deployer-elb-test-stickiness-policy-
 resource "aws_route53_record" "deployer-prod-test" {
   count = "${signum(var.enable_ssl) + 1 % 2}" # if enable_ssl is set to false, this will result in 0 and will create non-ssl resource
   zone_id = "${data.terraform_remote_state.env_state.route53_private_zone_id}"
-  name = "${var.app_name}-prod-test"
+  name = "${var.app_name}-${var.environment}-test"
   type = "A"
 
   alias {
@@ -353,7 +353,7 @@ resource "aws_route53_record" "deployer-prod-test" {
 resource "aws_route53_record" "deployer-prod-test-ssl" {
   count = "${signum(var.enable_ssl)}" # if enable_ssl is set to true, this will result in 1 and will create ssl resource
   zone_id = "${data.terraform_remote_state.env_state.route53_private_zone_id}"
-  name = "${var.app_name}-prod-test"
+  name = "${var.app_name}-${var.environment}-test"
   type = "A"
 
   alias {
