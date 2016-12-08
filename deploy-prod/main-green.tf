@@ -6,7 +6,7 @@ module "prod-green-group-deployer" {
   source = "git::https://github.com/stakater/blueprint-instance-pool-aws.git//modules/instance-pool"
 
   # Resource tags
-  name = "${var.app_name}-green-group"
+  name = "${var.app_name}-${var.environment}-green-group"
 
   # VPC parameters
   vpc_id  = "${data.terraform_remote_state.env_state.vpc_id}"
@@ -19,7 +19,7 @@ module "prod-green-group-deployer" {
   iam_assume_role_policy = "${file("../policy/assume-role-policy.json")}"
   iam_role_policy  = "${data.template_file.deployer-policy.rendered}"
   user_data        = "" # No user data as custom AMI will be launched
-  key_name         = "${var.app_name}-key"
+  key_name         = "${var.app_name}-${var.environment}-key"
   root_vol_size    = 30
   data_ebs_device_name  = "/dev/sdf"
   data_ebs_vol_size     = 50

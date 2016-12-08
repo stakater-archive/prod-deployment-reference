@@ -113,7 +113,7 @@ resource "aws_security_group" "deployer-sg-elb-ssl" {
 ## Creates Active ELB
 resource "aws_elb" "deployer-elb-active" {
   count                     = "${signum(var.enable_ssl) + 1 % 2}" # if enable_ssl is set to false, this will result in 0 and will create non-ssl resource
-  name                      = "${replace(var.app_name, "_", "-")}-${var.environment}-elb-active" #replace _ with - as _ is not allowed in elb-name
+  name                      = "${replace(var.app_name, "_", "-")}-${replace(var.environment, "_", "-")}-elb-active" #replace _ with - as _ is not allowed in elb-name
   security_groups           = ["${aws_security_group.deployer-sg-elb.id}"]
   subnets                   = ["${split(",",data.terraform_remote_state.env_state.public_subnet_ids)}"]
   internal                  = "${var.internal_support}"
@@ -155,7 +155,7 @@ resource "aws_lb_cookie_stickiness_policy" "deployer-elb-active-stickiness-polic
 
 resource "aws_elb" "deployer-elb-active-ssl" {
   count                     = "${signum(var.enable_ssl)}" # if enable_ssl is set to true, this will result in 1 and will create ssl resource
-  name                      = "${replace(var.app_name, "_", "-")}-${var.environment}-elb-active" #replace _ with - as _ is not allowed in elb-name
+  name                      = "${replace(var.app_name, "_", "-")}-${replace(var.environment, "_", "-")}-elb-active" #replace _ with - as _ is not allowed in elb-name
   security_groups           = ["${aws_security_group.deployer-sg-elb-ssl.id}"]
   subnets                   = ["${split(",",data.terraform_remote_state.env_state.public_subnet_ids)}"]
   internal                  = false
