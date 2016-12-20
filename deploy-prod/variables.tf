@@ -28,7 +28,7 @@ variable "app_name" {
   description = "Name of the application to deploy"
 }
 
-variable "ssl_certificate_id" {
+variable "ssl_certificate_arn" {
   description = "Required if you want ssl resources"
   default = ""
 }
