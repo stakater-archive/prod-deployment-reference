@@ -73,7 +73,7 @@ data "template_file" "deployer-policy" {
 
 ## Creates ELB security group
 resource "aws_security_group" "deployer-sg-elb" {
-  count       = "${signum(length(var.ssl_certificate_id)) + 1 % 2}" # if ssl_certificate_id is set, this will result in 0 and will create non-ssl resource
+  count       = "${signum(length(var.ssl_certificate_arn)) + 1 % 2}" # if ssl_certificate_arn is set, this will result in 0 and will create non-ssl resource
   name_prefix = "${var.app_name}-${var.environment}-elb-"
   vpc_id      = "${data.terraform_remote_state.env_state.vpc_id}"
 
@@ -104,7 +104,7 @@ resource "aws_security_group" "deployer-sg-elb" {
 
 ## Creates ELB security group
 resource "aws_security_group" "deployer-sg-elb-ssl" {
-  count       = "${signum(length(var.ssl_certificate_id))}" # if ssl_certificate_id is set, this will result in 1 and will create ssl resource
+  count       = "${signum(length(var.ssl_certificate_arn))}" # if ssl_certificate_arn is set, this will result in 1 and will create ssl resource
   name_prefix = "${var.app_name}-${var.environment}-elb-"
   vpc_id      = "${data.terraform_remote_state.env_state.vpc_id}"
 
@@ -142,7 +142,7 @@ resource "aws_security_group" "deployer-sg-elb-ssl" {
 
 ## Creates Active ELB
 resource "aws_elb" "deployer-elb-active" {
-  count                     = "${signum(length(var.ssl_certificate_id)) + 1 % 2}" # if ssl_certificate_id is set, this will result in 0 and will create non-ssl resource
+  count                     = "${signum(length(var.ssl_certificate_arn)) + 1 % 2}" # if ssl_certificate_arn is set, this will result in 0 and will create non-ssl resource
   name                      = "${replace(var.app_name, "_", "-")}-${replace(var.environment, "_", "-")}-elb-active" #replace _ with - as _ is not allowed in elb-name
   security_groups           = ["${aws_security_group.deployer-sg-elb.id}"]
   subnets                   = ["${split(",",data.terraform_remote_state.env_state.public_subnet_ids)}"]
@@ -177,14 +177,14 @@ resource "aws_elb" "deployer-elb-active" {
 
 # ELB Stickiness policy
 resource "aws_lb_cookie_stickiness_policy" "deployer-elb-active-stickiness-policy" {
-      count = "${signum(length(var.ssl_certificate_id)) + 1 % 2}" # if ssl_certificate_id is set, this will result in 0 and will create non-ssl resource
+      count = "${signum(length(var.ssl_certificate_arn)) + 1 % 2}" # if ssl_certificate_arn is set, this will result in 0 and will create non-ssl resource
       name = "${aws_elb.deployer-elb-active.name}-stickiness"
       load_balancer = "${aws_elb.deployer-elb-active.id}"
       lb_port = 80
 }
 
 resource "aws_elb" "deployer-elb-active-ssl" {
-  count                     = "${signum(length(var.ssl_certificate_id))}" # if ssl_certicate_id is set, this will result in 1 and will create ssl resource
+  count                     = "${signum(length(var.ssl_certificate_arn))}" # if ssl_certicate_id is set, this will result in 1 and will create ssl resource
   name                      = "${replace(var.app_name, "_", "-")}-${replace(var.environment, "_", "-")}-elb-active" #replace _ with - as _ is not allowed in elb-name
   security_groups           = ["${aws_security_group.deployer-sg-elb-ssl.id}"]
   subnets                   = ["${split(",",data.terraform_remote_state.env_state.public_subnet_ids)}"]
@@ -209,7 +209,7 @@ resource "aws_elb" "deployer-elb-active-ssl" {
     instance_protocol = "http"
     lb_port           = 443
     lb_protocol       = "https"
-    ssl_certificate_id = "${var.ssl_certificate_id}"
+    ssl_certificate_id = "${var.ssl_certificate_arn}"
   }
 
   health_check {
@@ -226,7 +226,7 @@ resource "aws_elb" "deployer-elb-active-ssl" {
 }
 
 resource "aws_lb_cookie_stickiness_policy" "deployer-elb-active-stickiness-policy-ssl-80" {
-      count = "${signum(length(var.ssl_certificate_id))}" # if ssl_certificate_id is set, this will result in 1 and will create ssl resource
+      count = "${signum(length(var.ssl_certificate_arn))}" # if ssl_certificate_arn is set, this will result in 1 and will create ssl resource
       name = "${aws_elb.deployer-elb-active-ssl.name}-stickiness"
       load_balancer = "${aws_elb.deployer-elb-active-ssl.id}"
       lb_port = 80
@@ -234,7 +234,7 @@ resource "aws_lb_cookie_stickiness_policy" "deployer-elb-active-stickiness-polic
 
 # ELB Stickiness policy
 resource "aws_lb_cookie_stickiness_policy" "deployer-elb-active-stickiness-policy-ssl-443" {
-      count = "${signum(length(var.ssl_certificate_id))}" # if ssl_certificate_id is set, this will result in 1 and will create ssl resource
+      count = "${signum(length(var.ssl_certificate_arn))}" # if ssl_certificate_arn is set, this will result in 1 and will create ssl resource
       name = "${aws_elb.deployer-elb-active-ssl.name}-stickiness"
       load_balancer = "${aws_elb.deployer-elb-active-ssl.id}"
       lb_port = 443
@@ -242,7 +242,7 @@ resource "aws_lb_cookie_stickiness_policy" "deployer-elb-active-stickiness-polic
 
 # Route53 record
 resource "aws_route53_record" "deployer-prod-active" {
-  count = "${signum(length(var.ssl_certificate_id)) + 1 % 2}" # if ssl_certificate_id is set, this will result in 0 and will create non-ssl resource
+  count = "${signum(length(var.ssl_certificate_arn)) + 1 % 2}" # if ssl_certificate_arn is set, this will result in 0 and will create non-ssl resource
   zone_id = "${data.terraform_remote_state.env_state.route53_private_zone_id}"
   name = "${var.app_name}-${var.environment}-active"
   type = "A"
@@ -256,7 +256,7 @@ resource "aws_route53_record" "deployer-prod-active" {
 
 # Route53 record
 resource "aws_route53_record" "deployer-prod-active-ssl" {
-  count = "${signum(length(var.ssl_certificate_id))}" # if ssl_certificate_id is set, this will result in 1 and will create ssl resource
+  count = "${signum(length(var.ssl_certificate_arn))}" # if ssl_certificate_arn is set, this will result in 1 and will create ssl resource
   zone_id = "${data.terraform_remote_state.env_state.route53_private_zone_id}"
   name = "${var.app_name}-${var.environment}-active"
   type = "A"
@@ -270,7 +270,7 @@ resource "aws_route53_record" "deployer-prod-active-ssl" {
 
 ## Creates Test ELB
 resource "aws_elb" "deployer-elb-test" {
-  count                     = "${signum(length(var.ssl_certificate_id)) + 1 % 2}" # if ssl_certificate_id is set, this will result in 0 and will create non-ssl resource
+  count                     = "${signum(length(var.ssl_certificate_arn)) + 1 % 2}" # if ssl_certificate_arn is set, this will result in 0 and will create non-ssl resource
   name                      = "${replace(var.app_name, "_", "-")}-${var.environment}-elb-test" #replace _ with - as _ is not allowed in elb-name
   security_groups           = ["${aws_security_group.deployer-sg-elb.id}"]
   subnets                   = ["${split(",",data.terraform_remote_state.env_state.public_subnet_ids)}"]
@@ -305,14 +305,14 @@ resource "aws_elb" "deployer-elb-test" {
 
 # ELB Stickiness policy
 resource "aws_lb_cookie_stickiness_policy" "deployer-elb-test-stickiness-policy" {
-      count = "${signum(length(var.ssl_certificate_id)) + 1 % 2}" # if ssl_certificate_id is set, this will result in 0 and will create non-ssl resource
+      count = "${signum(length(var.ssl_certificate_arn)) + 1 % 2}" # if ssl_certificate_arn is set, this will result in 0 and will create non-ssl resource
       name = "${aws_elb.deployer-elb-test.name}-stickiness"
       load_balancer = "${aws_elb.deployer-elb-test.id}"
       lb_port = 80
 }
 
 resource "aws_elb" "deployer-elb-test-ssl" {
-  count                     = "${signum(length(var.ssl_certificate_id))}" # if ssl_certificate_id is set, this will result in 1 and will create ssl resource
+  count                     = "${signum(length(var.ssl_certificate_arn))}" # if ssl_certificate_arn is set, this will result in 1 and will create ssl resource
   name                      = "${replace(var.app_name, "_", "-")}-${var.environment}-elb-test" #replace _ with - as _ is not allowed in elb-name
   security_groups           = ["${aws_security_group.deployer-sg-elb-ssl.id}"]
   subnets                   = ["${split(",",data.terraform_remote_state.env_state.public_subnet_ids)}"]
@@ -337,7 +337,7 @@ resource "aws_elb" "deployer-elb-test-ssl" {
     instance_protocol = "http"
     lb_port           = 443
     lb_protocol       = "https"
-    ssl_certificate_id = "${var.ssl_certificate_id}"
+    ssl_certificate_id = "${var.ssl_certificate_arn}"
   }
 
   health_check {
@@ -353,14 +353,14 @@ resource "aws_elb" "deployer-elb-test-ssl" {
   }
 }
 resource "aws_lb_cookie_stickiness_policy" "deployer-elb-test-stickiness-policy-ssl-80" {
-      count = "${signum(length(var.ssl_certificate_id))}" # if ssl_certificate_id is set, this will result in 1 and will create ssl resource
+      count = "${signum(length(var.ssl_certificate_arn))}" # if ssl_certificate_arn is set, this will result in 1 and will create ssl resource
       name = "${aws_elb.deployer-elb-test-ssl.name}-stickiness"
       load_balancer = "${aws_elb.deployer-elb-test-ssl.id}"
       lb_port = 80
 }
 
 resource "aws_lb_cookie_stickiness_policy" "deployer-elb-test-stickiness-policy-ssl-443" {
-      count = "${signum(length(var.ssl_certificate_id))}" # if ssl_certificate_id is set, this will result in 1 and will create ssl resource
+      count = "${signum(length(var.ssl_certificate_arn))}" # if ssl_certificate_arn is set, this will result in 1 and will create ssl resource
       name = "${aws_elb.deployer-elb-test-ssl.name}-stickiness"
       load_balancer = "${aws_elb.deployer-elb-test-ssl.id}"
       lb_port = 443
@@ -368,7 +368,7 @@ resource "aws_lb_cookie_stickiness_policy" "deployer-elb-test-stickiness-policy-
 
 # Route53 record
 resource "aws_route53_record" "deployer-prod-test" {
-  count = "${signum(length(var.ssl_certificate_id)) + 1 % 2}" # if ssl_certificate_id is set, this will result in 0 and will create non-ssl resource
+  count = "${signum(length(var.ssl_certificate_arn)) + 1 % 2}" # if ssl_certificate_arn is set, this will result in 0 and will create non-ssl resource
   zone_id = "${data.terraform_remote_state.env_state.route53_private_zone_id}"
   name = "${var.app_name}-${var.environment}-test"
   type = "A"
@@ -381,7 +381,7 @@ resource "aws_route53_record" "deployer-prod-test" {
 }
 
 resource "aws_route53_record" "deployer-prod-test-ssl" {
-  count = "${signum(length(var.ssl_certificate_id))}" # if ssl_certificate_id is set, this will result in 1 and will create ssl resource
+  count = "${signum(length(var.ssl_certificate_arn))}" # if ssl_certificate_arn is set, this will result in 1 and will create ssl resource
   zone_id = "${data.terraform_remote_state.env_state.route53_private_zone_id}"
   name = "${var.app_name}-${var.environment}-test"
   type = "A"
