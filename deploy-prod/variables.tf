@@ -113,6 +113,6 @@ variable "green_group_load_balancers" {
 variable "green_group_min_elb_capacity" {
   description = "Minimum number of healthy instances attached to the ELB."
 }
-variable "internal_support" {
+variable "is_elb_internal" {
   description = "If set false, This will exxpose the resoure publically."
 }
