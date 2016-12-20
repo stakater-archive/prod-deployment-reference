@@ -104,7 +104,7 @@ resource "aws_security_group" "deployer-sg-elb" {
 
 ## Creates ELB security group
 resource "aws_security_group" "deployer-sg-elb-ssl" {
-  count       = "${signum(var(var.ssl_certificate_id))}" # if ssl_certificate_id is set, this will result in 1 and will create ssl resource
+  count       = "${signum(length(var.ssl_certificate_id))}" # if ssl_certificate_id is set, this will result in 1 and will create ssl resource
   name_prefix = "${var.app_name}-${var.environment}-elb-"
   vpc_id      = "${data.terraform_remote_state.env_state.vpc_id}"
 
