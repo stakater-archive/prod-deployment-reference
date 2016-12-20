@@ -28,13 +28,8 @@ variable "app_name" {
   description = "Name of the application to deploy"
 }
 
-variable "enable_ssl" {
-  description = "If set to true, This will create resources with SSL settings enabled. If false, it will create resources without SSL settings enabled"
-  default = "0"
-}
-
 variable "ssl_certificate_id" {
-  description = "Required if enable_ssl is set"
+  description = "Required if you want ssl resources"
   default = ""
 }
 
