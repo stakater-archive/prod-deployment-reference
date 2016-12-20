@@ -1,3 +1,33 @@
+###############################################################################
+# Copyright 2016 Aurora Solutions
+#
+#    http://www.aurorasolutions.io
+#
+# Aurora Solutions is an innovative services and product company at
+# the forefront of the software industry, with processes and practices
+# involving Domain Driven Design(DDD), Agile methodologies to build
+# scalable, secure, reliable and high performance products.
+#
+# Stakater is an Infrastructure-as-a-Code DevOps solution to automate the
+# creation of web infrastructure stack on Amazon. Stakater is a collection
+# of Blueprints; where each blueprint is an opinionated, reusable, tested,
+# supported, documented, configurable, best-practices definition of a piece
+# of infrastructure. Stakater is based on Docker, CoreOS, Terraform, Packer,
+# Docker Compose, GoCD, Fleet, ETCD, and much more.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+###############################################################################
+
 ## Configures providers
 provider "aws" {
   region = "${var.aws_region}"
@@ -26,7 +56,7 @@ data "terraform_remote_state" "global-admiral" {
 # make sure this resource is created before the module prod-deployer
 resource "null_resource" "create-key-pair" {
   provisioner "local-exec" {
-      command = "../scripts/create-keypair.sh -k ${var.app_name}-key -r ${var.aws_region} -b ${data.terraform_remote_state.env_state.config-bucket-name}"
+      command = "../scripts/create-keypair.sh -k ${var.app_name}-${var.environment}-key -r ${var.aws_region} -b ${data.terraform_remote_state.env_state.config-bucket-name}"
   }
 }
 
@@ -74,7 +104,7 @@ resource "aws_security_group" "deployer-sg-elb" {
 
 ## Creates ELB security group
 resource "aws_security_group" "deployer-sg-elb-ssl" {
-  count       = "${signum(var.ssl_certificate_id)}" # if ssl_certificate_id is set, this will result in 1 and will create ssl resource
+  count       = "${signum(var(var.ssl_certificate_id))}" # if ssl_certificate_id is set, this will result in 1 and will create ssl resource
   name_prefix = "${var.app_name}-${var.environment}-elb-"
   vpc_id      = "${data.terraform_remote_state.env_state.vpc_id}"
 
@@ -112,8 +142,8 @@ resource "aws_security_group" "deployer-sg-elb-ssl" {
 
 ## Creates Active ELB
 resource "aws_elb" "deployer-elb-active" {
-  count                     = "${signum(var.ssl_certificate_id) + 1 % 2}" # if ssl_certificate_id is set, this will result in 0 and will create non-ssl resource
-  name                      = "${replace(var.app_name, "_", "-")}-${var.environment}-elb-active" #replace _ with - as _ is not allowed in elb-name
+  count                     = "${signum(length(var.ssl_certificate_id)) + 1 % 2}" # if ssl_certificate_id is set, this will result in 0 and will create non-ssl resource
+  name                      = "${replace(var.app_name, "_", "-")}-${replace(var.environment, "_", "-")}-elb-active" #replace _ with - as _ is not allowed in elb-name
   security_groups           = ["${aws_security_group.deployer-sg-elb.id}"]
   subnets                   = ["${split(",",data.terraform_remote_state.env_state.public_subnet_ids)}"]
   internal                  = "${var.internal_support}"
@@ -154,8 +184,8 @@ resource "aws_lb_cookie_stickiness_policy" "deployer-elb-active-stickiness-polic
 }
 
 resource "aws_elb" "deployer-elb-active-ssl" {
-  count                     = "${signum(var.ssl_certificate_id)}" # if ssl_certificate_id is set, this will result in 1 and will create ssl resource
-  name                      = "${replace(var.app_name, "_", "-")}-${var.environment}-elb-active" #replace _ with - as _ is not allowed in elb-name
+  count                     = "${signum(length(var.ssl_certificate_id))}" # if ssl_certicate_id is set, this will result in 1 and will create ssl resource
+  name                      = "${replace(var.app_name, "_", "-")}-${replace(var.environment, "_", "-")}-elb-active" #replace _ with - as _ is not allowed in elb-name
   security_groups           = ["${aws_security_group.deployer-sg-elb-ssl.id}"]
   subnets                   = ["${split(",",data.terraform_remote_state.env_state.public_subnet_ids)}"]
   internal                  = false
@@ -240,7 +270,7 @@ resource "aws_route53_record" "deployer-prod-active-ssl" {
 
 ## Creates Test ELB
 resource "aws_elb" "deployer-elb-test" {
-  count                     = "${signum(var.ssl_certificate_id) + 1 % 2}" # if ssl_certificate_id is set, this will result in 0 and will create non-ssl resource
+  count                     = "${signum(length(var.ssl_certificate_id)) + 1 % 2}" # if ssl_certificate_id is set, this will result in 0 and will create non-ssl resource
   name                      = "${replace(var.app_name, "_", "-")}-${var.environment}-elb-test" #replace _ with - as _ is not allowed in elb-name
   security_groups           = ["${aws_security_group.deployer-sg-elb.id}"]
   subnets                   = ["${split(",",data.terraform_remote_state.env_state.public_subnet_ids)}"]
@@ -282,7 +312,7 @@ resource "aws_lb_cookie_stickiness_policy" "deployer-elb-test-stickiness-policy"
 }
 
 resource "aws_elb" "deployer-elb-test-ssl" {
-  count                     = "${signum(var.ssl_certificate_id)}" # if ssl_certificate_id is set, this will result in 1 and will create ssl resource
+  count                     = "${signum(length(var.ssl_certificate_id))}" # if ssl_certificate_id is set, this will result in 1 and will create ssl resource
   name                      = "${replace(var.app_name, "_", "-")}-${var.environment}-elb-test" #replace _ with - as _ is not allowed in elb-name
   security_groups           = ["${aws_security_group.deployer-sg-elb-ssl.id}"]
   subnets                   = ["${split(",",data.terraform_remote_state.env_state.public_subnet_ids)}"]
