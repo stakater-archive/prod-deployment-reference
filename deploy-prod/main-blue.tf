@@ -50,11 +50,11 @@ module "prod-blue-group-deployer" {
   iam_role_policy  = "${data.template_file.deployer-policy.rendered}"
   user_data        = "" # No user data as custom AMI will be launched
   key_name         = "${var.app_name}-${var.environment}-key"
-  root_vol_size    = 30
-  data_ebs_device_name  = "/dev/sdf"
-  data_ebs_vol_size     = 50
-  logs_ebs_device_name  = "/dev/sdg"
-  logs_ebs_vol_size     = 20
+  root_vol_size    = 50
+  data_ebs_device_name  = ""
+  data_ebs_vol_size     = 0
+  logs_ebs_device_name  = ""
+  logs_ebs_vol_size     = 0
 
   # ASG parameters
   max_size         = "${var.blue_cluster_max_size}"
