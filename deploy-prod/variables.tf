@@ -119,14 +119,12 @@ variable "is_elb_internal" {
 
 #Active group parameters
 variable "active_elb_cidr_block" {
-  description = "Cidr block for active group accessibility"
-  type = "list"
-  default = ["0.0.0.0/0"]
+  description = ", separated Cidr blocks for active group accessibility"
+  default = "0.0.0.0/0"
 }
 
 #Test group parameters
 variable "test_elb_cidr_block" {
-  description = "Cidr block for test group accessibility"
-  type = "list"
-  default = ["0.0.0.0/0"]
+  description = ", separated Cidr blocks for test group accessibility"
+  default = "0.0.0.0/0"
 }

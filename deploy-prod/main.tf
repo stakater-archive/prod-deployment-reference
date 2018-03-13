@@ -88,7 +88,7 @@ resource "aws_security_group" "deployer-sg-elb-active" {
 
   # Allow HTTP traffic
   ingress {
-    cidr_blocks = "${var.active_elb_cidr_block}"
+    cidr_blocks = ["${split(",",var.active_elb_cidr_block)}"]
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
@@ -119,14 +119,14 @@ resource "aws_security_group" "deployer-sg-elb-active-ssl" {
 
   # Allow HTTP traffic
   ingress {
-    cidr_blocks = "${var.active_elb_cidr_block}"
+    cidr_blocks = ["${split(",",var.active_elb_cidr_block)}"]
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
   }
 
   ingress {
-    cidr_blocks = "${var.active_elb_cidr_block}"
+    cidr_blocks = ["${split(",",var.active_elb_cidr_block)}"]
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
@@ -157,7 +157,7 @@ resource "aws_security_group" "deployer-sg-elb-test" {
 
   # Allow HTTP traffic
   ingress {
-    cidr_blocks = "${var.test_elb_cidr_block}"
+    cidr_blocks = ["${split(",",var.test_elb_cidr_block)}"]
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
@@ -188,14 +188,14 @@ resource "aws_security_group" "deployer-sg-elb-test-ssl" {
 
   # Allow HTTP traffic
   ingress {
-    cidr_blocks = "${var.test_elb_cidr_block}"
+    cidr_blocks = ["${split(",",var.test_elb_cidr_block)}"]
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
   }
 
   ingress {
-    cidr_blocks = "${var.test_elb_cidr_block}"
+    cidr_blocks = ["${split(",",var.test_elb_cidr_block)}"]
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
