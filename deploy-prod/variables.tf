@@ -116,3 +116,17 @@ variable "green_group_min_elb_capacity" {
 variable "is_elb_internal" {
   description = "If set false, This will exxpose the resoure publically."
 }
+
+#Active group parameters
+variable "active_elb_cidr_block" {
+  description = "Cidr block for active group accessibility"
+  type = "list"
+  default = ["0.0.0.0/0"]
+}
+
+#Test group parameters
+variable "test_elb_cidr_block" {
+  description = "Cidr block for test group accessibility"
+  type = "list"
+  default = ["0.0.0.0/0"]
+}

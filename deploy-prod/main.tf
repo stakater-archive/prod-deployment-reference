@@ -71,14 +71,14 @@ data "template_file" "deployer-policy" {
   }
 }
 
-## Creates ELB security group
-resource "aws_security_group" "deployer-sg-elb" {
+## Creates Active ELB security group
+resource "aws_security_group" "deployer-sg-elb-active" {
   count       = "${signum(length(var.ssl_certificate_arn)) + 1 % 2}" # if ssl_certificate_arn is set, this will result in 0 and will create non-ssl resource
-  name_prefix = "${var.app_name}-${var.environment}-elb-"
+  name_prefix = "${var.app_name}-${var.environment}-elb-active-"
   vpc_id      = "${data.terraform_remote_state.env_state.vpc_id}"
 
   tags {
-    Name        = "${var.app_name}-${var.environment}-elb"
+    Name        = "${var.app_name}-${var.environment}-elb-active"
     managed_by  = "Stakater"
   }
 
@@ -88,7 +88,7 @@ resource "aws_security_group" "deployer-sg-elb" {
 
   # Allow HTTP traffic
   ingress {
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = "${var.active_elb_cidr_block}"
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
@@ -102,14 +102,14 @@ resource "aws_security_group" "deployer-sg-elb" {
   }
 }
 
-## Creates ELB security group
-resource "aws_security_group" "deployer-sg-elb-ssl" {
+## Creates Active ELB security group
+resource "aws_security_group" "deployer-sg-elb-active-ssl" {
   count       = "${signum(length(var.ssl_certificate_arn))}" # if ssl_certificate_arn is set, this will result in 1 and will create ssl resource
-  name_prefix = "${var.app_name}-${var.environment}-elb-"
+  name_prefix = "${var.app_name}-${var.environment}-elb-active-"
   vpc_id      = "${data.terraform_remote_state.env_state.vpc_id}"
 
   tags {
-    Name        = "${var.app_name}-${var.environment}-elb"
+    Name        = "${var.app_name}-${var.environment}-elb-active"
     managed_by  = "Stakater"
   }
 
@@ -119,14 +119,83 @@ resource "aws_security_group" "deployer-sg-elb-ssl" {
 
   # Allow HTTP traffic
   ingress {
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = "${var.active_elb_cidr_block}"
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
   }
 
   ingress {
+    cidr_blocks = "${var.active_elb_cidr_block}"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+  }
+
+  egress {
     cidr_blocks = ["0.0.0.0/0"]
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+  }
+}
+
+## Creates Test ELB security group
+resource "aws_security_group" "deployer-sg-elb-test" {
+  count       = "${signum(length(var.ssl_certificate_arn)) + 1 % 2}" # if ssl_certificate_arn is set, this will result in 0 and will create non-ssl resource
+  name_prefix = "${var.app_name}-${var.environment}-elb-test-"
+  vpc_id      = "${data.terraform_remote_state.env_state.vpc_id}"
+
+  tags {
+    Name        = "${var.app_name}-${var.environment}-elb-test"
+    managed_by  = "Stakater"
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  # Allow HTTP traffic
+  ingress {
+    cidr_blocks = "${var.test_elb_cidr_block}"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+  }
+
+  egress {
+    cidr_blocks = ["0.0.0.0/0"]
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+  }
+}
+
+## Creates Test ELB security group
+resource "aws_security_group" "deployer-sg-elb-test-ssl" {
+  count       = "${signum(length(var.ssl_certificate_arn))}" # if ssl_certificate_arn is set, this will result in 1 and will create ssl resource
+  name_prefix = "${var.app_name}-${var.environment}-elb-test-"
+  vpc_id      = "${data.terraform_remote_state.env_state.vpc_id}"
+
+  tags {
+    Name        = "${var.app_name}-${var.environment}-elb-test"
+    managed_by  = "Stakater"
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  # Allow HTTP traffic
+  ingress {
+    cidr_blocks = "${var.test_elb_cidr_block}"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+  }
+
+  ingress {
+    cidr_blocks = "${var.test_elb_cidr_block}"
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
@@ -144,7 +213,7 @@ resource "aws_security_group" "deployer-sg-elb-ssl" {
 resource "aws_elb" "deployer-elb-active" {
   count                     = "${signum(length(var.ssl_certificate_arn)) + 1 % 2}" # if ssl_certificate_arn is set, this will result in 0 and will create non-ssl resource
   name                      = "${replace(var.app_name, "_", "-")}-${replace(var.environment, "_", "-")}-elb-active" #replace _ with - as _ is not allowed in elb-name
-  security_groups           = ["${aws_security_group.deployer-sg-elb.id}"]
+  security_groups           = ["${aws_security_group.deployer-sg-elb-active.id}"]
   subnets                   = ["${split(",",data.terraform_remote_state.env_state.public_subnet_ids)}"]
   internal                  = "${var.is_elb_internal}"
   cross_zone_load_balancing = true
@@ -186,7 +255,7 @@ resource "aws_lb_cookie_stickiness_policy" "deployer-elb-active-stickiness-polic
 resource "aws_elb" "deployer-elb-active-ssl" {
   count                     = "${signum(length(var.ssl_certificate_arn))}" # if ssl_certicate_id is set, this will result in 1 and will create ssl resource
   name                      = "${replace(var.app_name, "_", "-")}-${replace(var.environment, "_", "-")}-elb-active" #replace _ with - as _ is not allowed in elb-name
-  security_groups           = ["${aws_security_group.deployer-sg-elb-ssl.id}"]
+  security_groups           = ["${aws_security_group.deployer-sg-elb-active-ssl.id}"]
   subnets                   = ["${split(",",data.terraform_remote_state.env_state.public_subnet_ids)}"]
   internal                  = false
   cross_zone_load_balancing = true
@@ -272,7 +341,7 @@ resource "aws_route53_record" "deployer-prod-active-ssl" {
 resource "aws_elb" "deployer-elb-test" {
   count                     = "${signum(length(var.ssl_certificate_arn)) + 1 % 2}" # if ssl_certificate_arn is set, this will result in 0 and will create non-ssl resource
   name                      = "${replace(var.app_name, "_", "-")}-${var.environment}-elb-test" #replace _ with - as _ is not allowed in elb-name
-  security_groups           = ["${aws_security_group.deployer-sg-elb.id}"]
+  security_groups           = ["${aws_security_group.deployer-sg-elb-test.id}"]
   subnets                   = ["${split(",",data.terraform_remote_state.env_state.public_subnet_ids)}"]
   internal                  = "${var.is_elb_internal}"
   cross_zone_load_balancing = true
@@ -314,7 +383,7 @@ resource "aws_lb_cookie_stickiness_policy" "deployer-elb-test-stickiness-policy"
 resource "aws_elb" "deployer-elb-test-ssl" {
   count                     = "${signum(length(var.ssl_certificate_arn))}" # if ssl_certificate_arn is set, this will result in 1 and will create ssl resource
   name                      = "${replace(var.app_name, "_", "-")}-${var.environment}-elb-test" #replace _ with - as _ is not allowed in elb-name
-  security_groups           = ["${aws_security_group.deployer-sg-elb-ssl.id}"]
+  security_groups           = ["${aws_security_group.deployer-sg-elb-test-ssl.id}"]
   subnets                   = ["${split(",",data.terraform_remote_state.env_state.public_subnet_ids)}"]
   internal                  = false
   cross_zone_load_balancing = true
